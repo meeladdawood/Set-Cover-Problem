@@ -101,7 +101,7 @@ public class TRIAL
 	{
 		for (Ticket others:everything)
 		{
-			if (others.getID() < root.getID() && !decisions.contains(others.getID()))
+			if (others.getID() != root.getID() && !decisions.contains(others.getID()))
 			{
 				decisions.add(others.getID());
 				runningSum.addAll(others.getNumbers());
