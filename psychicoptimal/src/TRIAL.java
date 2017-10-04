@@ -3,7 +3,7 @@ import java.util.*;
 class Ticket
 {
 	private static int IDCounter = 0;
-	private int ID; 
+	private int ID;  
 	private HashSet<Integer> numbers = new HashSet<Integer>();
 	public Ticket ()
 	{
@@ -18,22 +18,51 @@ class Ticket
 	{
 		return numbers;
 	}
+	public static void IDReset () 
+	{
+		IDCounter = 0;
+	}
+	public boolean contains (Ticket b)
+	{
+		//Ticket a contains ticket b
+		HashSet <Integer> aNumbers = this.getNumbers();
+		for (Integer number: b.getNumbers())
+		{
+			if (!aNumbers.contains(number))
+				return false;
+		}
+		return true;
+	}
 }
+class Combination 
+{ 
+	private static int IDCounter = 0; 
+	private int ID; 
+	private HashSet<Integer> numbers = new HashSet<Integer>();
+	public Combination ()
+	{
+		
+	}
+}
+
 
 public class TRIAL 
 {
-	static ArrayList<ArrayList<Integer>> results = new ArrayList<ArrayList<Integer>>();
 	static ArrayList<Ticket> everything = new ArrayList<Ticket>();
+	static ArrayList<Ticket> possibilities = new ArrayList<Ticket>();
+	static ArrayList<ArrayList<Integer>> possibilityScan;
+	static private int bestValue; 
 	public static void main (String [] args)
 	{
-		int n = 5, k = 3, j = 3, i = 2;
+		int n = 5, k = 3, j = 2, i = 2;
 		//Set <Integer> something = new TreeSet <Integer>();
+		
+		// Setup ticket range
 		int[] elements = new int[n];
 		for (int index = 0; index < n; index++)
 			elements[index] = index + 1; 
 		int [] data = new int [n];
-		generateRecursive(elements, data, 0, n-1, 0, k);
-		
+		generateRecursive(elements, data, 0, n-1, 0, k, true);
 		for (Ticket e:everything)
 		{
 			System.out.println(e.getID() + ":  " + e.getNumbers());
@@ -41,7 +70,43 @@ public class TRIAL
 		for (int checker:elements)
 			System.out.print(checker + " ");
 		System.out.println();
+		
+		
+		// Setup promised number range
+		Ticket.IDReset();
+		int[] givenData = new int[n];
 
+		// Generate combinations of promised numbers
+		generateRecursive(elements, givenData, 0, n-1, 0, j, false);
+	
+		bestValue = everything.size();
+		possibilityScan = new ArrayList<ArrayList<Integer>>();
+		
+		for (int index0 = 0; index0 < possibilityScan.size(); index0++) 
+			possibilityScan.add(new ArrayList<Integer>());
+			
+		// Check off possibilities with tickets 
+		for (int indexA = 0; indexA < everything.size(); indexA++)
+		{
+			for (int indexB = 0; indexB < possibilities.size(); indexB++) 
+			{
+				if (everything.get(indexA).contains(possibilities.get(indexB)))
+				{
+					possibilityScan.get(indexB).add(everything.get(indexA).getID());
+				}
+			}
+		}
+		for (int indexC = 0; indexC < possibilities.size(); indexC++)
+		{
+			Ticket e = possibilities.get(indexC);
+			System.out.println(e.getID() + ":  " + e.getNumbers() + ", " + possibilityScan.get(indexC).toString());
+		}
+		
+		
+		
+		
+		
+		
 		// Check entries with brute-force
 		int smallest = everything.size();
 		ArrayList<Integer> smallestSet = new ArrayList<Integer>();
@@ -101,55 +166,11 @@ public class TRIAL
 			//System.out.println("Iteration done");
 		}
 		System.out.println("done, smallest = " + smallest + ", smallest set = " + smallestSet);
-		// CHECKING OUT A BFS FOR SHORTEST, CHECKCOMBINATION IS CURRENTLY A DFS
+		// CHECKING OUT A BFS FOR SHORTEST, CHECKCOMBINATION )IS CURRENTLY A DFS
 		//checkCombinationBFS();
 	}
-/*	static ArrayList<Integer> runningSumCalculator (Ticket root, ArrayList<Integer> decisions, HashSet<Integer> runningSum, int[] data, int smallest)
-	{
-		for (Ticket others:everything)
-		{
-			if (others.getID() != root.getID() && !decisions.contains(others.getID()))
-			{
-				decisions.add(others.getID());
-				runningSum.addAll(others.getNumbers());
-				
-				System.out.print("Checking: ");
-				for (int i = 0; i < decisions.size(); i++)
-				{
-					System.out.print((decisions.get(i)) + " ");
-				}
-				System.out.println();
-				boolean containsAll = true;
-				for (int checkNext: data)
-				{
-				
-					if (!runningSum.contains(checkNext))
-					{
-						// Not quite
-						//System.out.println("does not contain " + checkNext);
-						containsAll = false;
-						break;
-					}
-				}
-				if (!containsAll || containsAll) // CHANGE THIS LATER
-				{
-					for (Ticket a:everything)
-					{
-						ArrayList<Integer> results = runningSumCalculator(others, decisions, runningSum, data, smallest);
-						if (results.size() < smallest) 
-						{
-							smallest = results.size();
-
-						}
-					}
-				}
-			}
-			//System.out.println("one repeated or root: " + others.getID())
-		}
-		return decisions; 
-
-	}*/
-	static void generateRecursive(int arr[], int data[], int start, int end, int index, int r)
+	
+	static void generateRecursive(int arr[], int data[], int start, int end, int index, int r, boolean ticket)
 	{
 		if (index == r)
 		{
@@ -160,50 +181,16 @@ public class TRIAL
 				//System.out.print(data[j]+" ");
 				toAdd.addNumber(data[j]);
 			}
-			everything.add(toAdd);
-			return;
+			if (ticket) everything.add(toAdd);
+			else possibilities.add(toAdd);
 		}
 		for (int i=start; i<=end && end-i+1 >= r-index; i++)
 		{
 			data[index] = arr[i];
-			generateRecursive(arr, data, i+1, end, index+1, r);
+			generateRecursive(arr, data, i+1, end, index+1, r, ticket);
 		}
 	}
-
-	//static boolean checkCombinationHelper (int factor, int index, int[] data)
-	//{
-		/*
-		for (int sumOf = 0; sumOf <= factor; sumOf++)
-		{
-			System.out.println("FACTOR " + sumOf);
-			for (int start = 0; start < results.size(); start++)
-			{
-				for (int add = start + 1; add < results.size(); add++)
-				{
-				System.out.println("start = " + start );
-				for (Integer s: checkCombination(sumOf, start, add, data))
-					System.out.print(s + " ");					
-				System.out.println();
-				}
-			}
-		}
-		return false;
-		
-		
-	}
-	static HashSet<Integer> checkCombination (int factor, int startIndex, int add, int[] data)
-	{
-		if (factor == 0)
-			return everything.get(startIndex).getNumbers();
-		else 
-		{
-			HashSet<Integer> toReturn = new HashSet<Integer>();
-			toReturn.addAll(everything.get(startIndex).getNumbers());
-			toReturn.addAll(checkCombination(factor - 1, startIndex + add, add--, data));
-			return toReturn;
-		}
-	}
-	*/
+	
 static boolean[]  runningSumTrial (Ticket root, Ticket target, boolean[] decisions, HashSet<Integer> runningSum, int[] data, int smallest)
 {
 	if (target.getID() != root.getID()&& decisions[target.getID()] == false)
@@ -258,54 +245,3 @@ static boolean[]  runningSumTrial (Ticket root, Ticket target, boolean[] decisio
 
 }
 }
-/*	static ArrayList<Ticket> checkCombinationBFS (int [] data, int layersDown)
-	{
-		Queue<Ticket> toCheck = new PriorityQueue<Ticket>();
-		for (Ticket e:everything)
-			toCheck.add(e);
-		while (!toCheck.isEmpty())
-		{
-			Ticket check = toCheck.poll();
-			for (Ticket allOthers:everything)
-			{
-				if (check.getID() != allOthers.getID())
-				{
-					ArrayList<Ticket> combo = new ArrayList<Ticket> ();
-					combo.add(check);
-					
-					
-					// RECURSIVELY ADD ALL OTHERS TO CHECK
-					//combo.addAll(allOthers.getNumbers());
-					for (Integer another: (checkSingle(check, layersDown)))
-					{
-						combo.add(another);
-					}
-					
-					
-
-					// Check combo set for all entries
-					boolean works = true;
-					for (int b: data)
-					{
-						if (!combo.contains(b))
-						{
-							works = false;
-							break;
-						}
-					}
-					if (works) 
-					{
-						return combo;
-					}
-					else return null;
-				}
-			}
-		}
-	}
-	static ArrayList<Integer> checkSingle(Ticket target, int layer)
-	{
-		Queue<Ticket> next = new PriorityQueue<Ticket>();
-		
-	}
-}
-*/
