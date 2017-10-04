@@ -22,16 +22,19 @@ class Ticket
 	{
 		IDCounter = 0;
 	}
-	public boolean contains (Ticket b)
+	public boolean contains (Combination b, int requiredToContain)
 	{
 		//Ticket a contains ticket b
-		HashSet <Integer> aNumbers = this.getNumbers();
+		//HashSet <Integer> aNumbers = this.getNumbers();
+		int contains = 0;
 		for (Integer number: b.getNumbers())
 		{
-			if (!aNumbers.contains(number))
-				return false;
+			if (this.numbers.contains(number))
+				contains++;
+			if (contains >= requiredToContain) 
+				return true;
 		}
-		return true;
+		return false;
 	}
 }
 class Combination 
@@ -41,7 +44,16 @@ class Combination
 	private HashSet<Integer> numbers = new HashSet<Integer>();
 	public Combination ()
 	{
-		
+		this.ID = IDCounter++;
+	}
+	public void addNumber (int n) 
+	{
+		numbers.add(n);
+	}
+	public int getID () { return this.ID; }
+	public HashSet<Integer> getNumbers()
+	{
+		return numbers;
 	}
 }
 
@@ -49,12 +61,10 @@ class Combination
 public class TRIAL 
 {
 	static ArrayList<Ticket> everything = new ArrayList<Ticket>();
-	static ArrayList<Ticket> possibilities = new ArrayList<Ticket>();
-	static ArrayList<ArrayList<Integer>> possibilityScan;
-	static private int bestValue; 
+	static ArrayList<Combination> possibilities = new ArrayList<Combination>(); 
 	public static void main (String [] args)
 	{
-		int n = 5, k = 3, j = 2, i = 2;
+		int n = 4, k = 3, j = 2, l = 2;
 		//Set <Integer> something = new TreeSet <Integer>();
 		
 		// Setup ticket range
@@ -72,41 +82,34 @@ public class TRIAL
 		System.out.println();
 		
 		
-		// Setup promised number range
-		Ticket.IDReset();
+		// Setup pro mised number range
 		int[] givenData = new int[n];
 
 		// Generate combinations of promised numbers
 		generateRecursive(elements, givenData, 0, n-1, 0, j, false);
 	
-		bestValue = everything.size();
-		possibilityScan = new ArrayList<ArrayList<Integer>>();
-		
-		for (int index0 = 0; index0 < possibilityScan.size(); index0++) 
-			possibilityScan.add(new ArrayList<Integer>());
 			
 		// Check off possibilities with tickets 
-		for (int indexA = 0; indexA < everything.size(); indexA++)
+		for (Combination heil: possibilities)
 		{
-			for (int indexB = 0; indexB < possibilities.size(); indexB++) 
-			{
-				if (everything.get(indexA).contains(possibilities.get(indexB)))
-				{
-					possibilityScan.get(indexB).add(everything.get(indexA).getID());
-				}
-			}
+			System.out.println(heil.getNumbers());
 		}
+		System.out.println(possibilities.size());
+		
+		
+		runningSumBruteForce(everything.get(0), null, elements, l);
+		/*
 		for (int indexC = 0; indexC < possibilities.size(); indexC++)
 		{
 			Ticket e = possibilities.get(indexC);
 			System.out.println(e.getID() + ":  " + e.getNumbers() + ", " + possibilityScan.get(indexC).toString());
 		}
 		
+		*/
 		
 		
 		
-		
-		
+		/*
 		// Check entries with brute-force
 		int smallest = everything.size();
 		ArrayList<Integer> smallestSet = new ArrayList<Integer>();
@@ -168,21 +171,99 @@ public class TRIAL
 		System.out.println("done, smallest = " + smallest + ", smallest set = " + smallestSet);
 		// CHECKING OUT A BFS FOR SHORTEST, CHECKCOMBINATION )IS CURRENTLY A DFS
 		//checkCombinationBFS();
+		 */
+		 
 	}
+	
+	static LinkedList<Ticket> runningSumBruteForce (Ticket root, LinkedList<Ticket> decisions, int[] data, int requiredToContain)
+	{
+		if (decisions == null) decisions = new LinkedList<Ticket>();
+		
+		System.out.print("Checking " + root.getNumbers() + " with ");
+		for (Ticket che:decisions)
+			System.out.print(che.getNumbers() + " " );
+		System.out.println();
+		// Check the combinations on this list of tickets
+		boolean allFound = true;
+		for (Combination each:possibilities)
+		{
+			if (!root.contains(each, requiredToContain))
+			{
+				boolean foundElsewhere = false;
+				for (Ticket checkDecisions:decisions)
+				{
+					if (checkDecisions.contains(each, requiredToContain))
+					{
+						foundElsewhere = true;
+						break;
+					}
+				}
+				if (!foundElsewhere) allFound = false;
+			}
+			//System.out.println("Root contains " + each.getNumbers());
+		}
+		
+		
+		// Not all combinations are covered, call recursively on larger sets
+		if (!allFound) 
+		{
+			System.out.println("Not all were found");
+			for (int index = root.getID() + 1; index < everything.size(); index++)
+			{
+				LinkedList<Ticket> newDecisions = decisions;
+				newDecisions.add(root);
+				LinkedList<Ticket> found = runningSumBruteForce(everything.get(index), newDecisions, data, requiredToContain);
+				if (found != null) 
+				{
+					/*System.out.println("Found a winner:" );
+					for (Ticket winner:found) 
+						System.out.println(winner.getNumbers());
+					System.out.println("END WINNER");
+					*/
+				}
+			}
+			return null;
+		}
+		else 
+		{
+			// All combinations are covered, return the decisions list
+			System.out.println("Found a working one");
+			System.out.println(root.getNumbers());
+			for (Ticket d:decisions) 
+				System.out.println(d.getNumbers());
+			return decisions;
+		}
+	}
+	
+	
+	
+	
 	
 	static void generateRecursive(int arr[], int data[], int start, int end, int index, int r, boolean ticket)
 	{
 		if (index == r)
 		{
 			//ArrayList<Integer> entry = new ArrayList<Integer> ();
-			Ticket toAdd = new Ticket();
-			for (int j=0; j<r; j++)
+			if (ticket) 
 			{
-				//System.out.print(data[j]+" ");
-				toAdd.addNumber(data[j]);
+				Ticket toAdd = new Ticket();
+				for (int j=0; j<r; j++)
+				{
+					//System.out.print(data[j]+" ");
+					toAdd.addNumber(data[j]);
+				}
+				 everything.add(toAdd);	
 			}
-			if (ticket) everything.add(toAdd);
-			else possibilities.add(toAdd);
+			else 
+			{
+				Combination toAdd = new Combination();
+				for (int j=0; j<r; j++)
+				{
+					//System.out.print(data[j]+" ");
+					toAdd.addNumber(data[j]);
+				}
+				possibilities.add(toAdd);
+			}
 		}
 		for (int i=start; i<=end && end-i+1 >= r-index; i++)
 		{
