@@ -5,6 +5,7 @@ class Ticket
 	private static int IDCounter = 0;
 	private int ID;  
 	private HashSet<Integer> numbers = new HashSet<Integer>();
+	private boolean isNull = false;
 	public Ticket ()
 	{
 		this.ID = IDCounter++;
@@ -22,10 +23,12 @@ class Ticket
 	{
 		IDCounter = 0;
 	}
+	public void setNull () { isNull = true; this.ID = -1; }
+	public boolean isNull() { return isNull; }
 	public boolean contains (Combination b, int requiredToContain)
 	{
 		//Ticket a contains ticket b
-		//HashSet <Integer> aNumbers = this.getNumbers();
+		if (this.numbers.isEmpty()) return false;
 		int contains = 0;
 		for (Integer number: b.getNumbers())
 		{
@@ -65,7 +68,7 @@ public class TRIAL
 	static ArrayList<Combination> possibilities = new ArrayList<Combination>(); 
 	public static void main (String [] args)
 	{
-		int n = 5, k = 3, j = 3, l = 2;
+		int n = 7, k = 3, j = 2, l = 2;
 		
 		// Setup ticket range
 		int[] elements = new int[n];
@@ -98,13 +101,13 @@ public class TRIAL
 		System.out.println(possibilities.size());
 		
 		
-		
 		// DFS Search all combinations for possible smallest values
-		for (int startingIndex = 0; startingIndex < everything.size(); startingIndex++)
-		{
-			runningSumBruteForce(everything.get(0), null, elements, l);
-			// DONT UNDERESTIMATE THIS, RUNS in 2^n
-		}
+		Ticket nullTicket = new Ticket(); 
+		nullTicket.setNull();
+		
+		
+		// THIS IS IT, TAKES ALL THE TIME. 
+		runningSumBruteForce(nullTicket, null, elements, l);
 		
 		System.out.println("RESULTS-----------------------");
 		System.out.println("Smallest = " + smallest);
@@ -119,10 +122,10 @@ public class TRIAL
 	{
 		if (decisions == null) decisions = new LinkedList<Ticket>();
 		
-		System.out.print("Checking " + root.getID() + " with ");
-		for (Ticket che:decisions)
-			System.out.print(che.getID()+ " " );
-		System.out.println();
+		//System.out.print("Checking " + root.getID() + " with ");
+		//for (Ticket che:decisions)
+		//	System.out.print(che.getID()+ " " );
+		//System.out.println();
 		// Check the combinations on this list of tickets
 		boolean allFound = true;
 		for (Combination each:possibilities)
@@ -146,11 +149,11 @@ public class TRIAL
 		// Not all combinations are covered, call recursively on larger sets
 		if (!allFound) 
 		{
-			System.out.println("Not all were found");
 			for (int index = root.getID() + 1; index < everything.size(); index++)
 			{
 				LinkedList<Ticket> newDecisions = new LinkedList<Ticket>(decisions);
-				newDecisions.add(root);
+				if (root.getID() != -1) 
+					newDecisions.add(root);
 				LinkedList<Ticket> found = runningSumBruteForce(everything.get(index), newDecisions, data, requiredToContain);
 				if (found != null) 
 				{
@@ -158,6 +161,8 @@ public class TRIAL
 					{
 						bestPath = new LinkedList<Ticket>(found);
 						smallest = found.size();
+						System.out.println("FOUND NEW SMALLEST: " + smallest);
+
 					}
 				}
 			}
@@ -167,9 +172,9 @@ public class TRIAL
 		{
 			// All combinations are covered, return the decisions list and root
 			decisions.add(root);
-			System.out.println("Found a working one");
+			/*System.out.println("Found a working one");
 			for (Ticket d:decisions) 
-				System.out.println(d.getNumbers());
+				System.out.println(d.getNumbers());*/
 			return decisions;
 		}
 	}
