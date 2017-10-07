@@ -1,12 +1,12 @@
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.TreeSet;
 import java.util.LinkedList;
 
 class Combination 
 { 
 	private static int IDCounter = 0; 
 	private int ID; 
-	private HashSet<Integer> numbers = new HashSet<Integer>();
+	private TreeSet<Integer> numbers = new TreeSet<Integer>();
 	private boolean checked = false;
 	public Combination ()
 	{
@@ -17,26 +17,27 @@ class Combination
 		numbers.add(n);
 	}
 	public int getID () { return this.ID; }
-	public HashSet<Integer> getNumbers()
+	public TreeSet<Integer> getNumbers()
 	{
 		return numbers;
 	}
 	public void setChecked() { this.checked = true; } 
 	public boolean isChecked() { return this.checked; }
-	public int contains (HashSet<Integer> b)
+	public int contains (TreeSet<Integer> b)
 	{
 		// How many numbers of this instance of Combination does b contain?
 		if (b.isEmpty() || this.numbers.isEmpty()) return 0;
-		HashSet<Integer> temporary = new HashSet<Integer>(numbers);
+		TreeSet<Integer> temporary = new TreeSet<Integer>(numbers);
 		int startSize = temporary.size();
 		temporary.removeAll(b);
 		return (startSize - temporary.size());
 	}
-	public int notContains (HashSet<Integer> c)
+	// REDUNDANT XD
+	public int notContains (TreeSet<Integer> c)
 	{
 		// How many numbers of this instance is c missing?
 		if (c.isEmpty()) return numbers.size();
-		HashSet<Integer> temporary = new HashSet<Integer>(numbers);
+		TreeSet<Integer> temporary = new TreeSet<Integer>(numbers);
 		temporary.removeAll(c);
 		return temporary.size();
 	}
@@ -48,7 +49,8 @@ public class TRIAL2
 	static ArrayList<Combination> possibilities = new ArrayList<Combination>(); 
 	public static void main (String [] args)
 	{
-		int n = 10, k = 3, j = 3, l = 2;
+		int n = 5, k = 4, j = 2, l = 2;
+		// n >= k >= j >= l
 		
 		// Setup ticket range
 		int[] elements = new int[n];
@@ -63,30 +65,33 @@ public class TRIAL2
 	
 			
 		// Check off possibilities with tickets 
-		for (Combination heil: possibilities)
+		for (Combination s: possibilities)
 		{
-			System.out.println(heil.getNumbers());
+			System.out.println(s.getNumbers());
 		}
 		System.out.println(possibilities.size());
 		
-		LinkedList<HashSet<Integer>> results = generateTickets(l, k);
-		// DFS Search all combinations for possible smallest values
-		// THIS IS IT, TAKES ALL THE TIME. 
 		
-		for(HashSet<Integer> d :results)
+		// DO THE ENTIRE THING
+		LinkedList<TreeSet<Integer>> results = generateTickets(l, k, n);
+		
+		// PRINT RESULTS
+		System.out.println("RESULTS------------------");
+		System.out.println("Number of Tickets == " + results.size());
+		for(TreeSet<Integer> d :results)
 		{
 			System.out.println(d.toString());
 		}
 
 	}
 	
-	static LinkedList<HashSet<Integer>> generateTickets (int requiredToContain, int ticketSize)
+	static LinkedList<TreeSet<Integer>> generateTickets (int requiredToContain, int ticketSize, int n)
 	{
-		LinkedList<HashSet<Integer>> toReturn = new LinkedList<HashSet<Integer>>();
+		LinkedList<TreeSet<Integer>> toReturn = new LinkedList<TreeSet<Integer>>();
 		boolean cont = true;
 		while (cont)
 		{
-			HashSet<Integer> ticket = new HashSet<Integer>();
+			TreeSet<Integer> ticket = new TreeSet<Integer>();
 			System.out.println("New Ticket");
 			boolean denyEntry = false;
 			for (int index = 0; index < possibilities.size(); index++)
@@ -124,6 +129,16 @@ public class TRIAL2
 			}
 			if (!ticket.isEmpty())
 			{
+				if (ticket.size() < ticketSize)
+				{
+					/* 	Runs only for the final ticket. If it works but is not
+					 * 	full, fill with random values. 
+					 */
+					for (int addExtra = 1; addExtra <= n && ticket.size() < ticketSize; addExtra++)
+					{
+						if (!ticket.contains(addExtra)) ticket.add(addExtra);
+					}
+				}
 				toReturn.add(ticket);
 				System.out.println("Adding a ticket\t\t " + ticket.toString());
 			}

@@ -65,7 +65,7 @@ public class TRIAL
 	static ArrayList<Combination> possibilities = new ArrayList<Combination>(); 
 	public static void main (String [] args)
 	{
-		int n = 5, k = 3, j = 1, l = 1;
+		int n = 5, k = 4, j = 2, l = 2;
 		
 		// Setup ticket range
 		int[] elements = new int[n];
@@ -91,9 +91,9 @@ public class TRIAL
 	
 			
 		// Check off possibilities with tickets 
-		for (Combination heil: possibilities)
+		for (Combination s: possibilities)
 		{
-			System.out.println(heil.getNumbers());
+			System.out.println(s.getNumbers());
 		}
 		System.out.println(possibilities.size());
 		
