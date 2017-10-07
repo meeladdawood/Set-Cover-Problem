@@ -5,10 +5,13 @@ class Ticket
 	private static int IDCounter = 0;
 	private int ID;  
 	private HashSet<Integer> numbers = new HashSet<Integer>();
-	private boolean isNull = false;
 	public Ticket ()
 	{
 		this.ID = IDCounter++;
+	}
+	public Ticket (int id)
+	{
+		this.ID = id;
 	}
 	public void addNumber(int a)
 	{
@@ -19,12 +22,6 @@ class Ticket
 	{
 		return numbers;
 	}
-	public static void IDReset () 
-	{
-		IDCounter = 0;
-	}
-	public void setNull () { isNull = true; this.ID = -1; }
-	public boolean isNull() { return isNull; }
 	public boolean contains (Combination b, int requiredToContain)
 	{
 		//Ticket a contains ticket b
@@ -68,7 +65,7 @@ public class TRIAL
 	static ArrayList<Combination> possibilities = new ArrayList<Combination>(); 
 	public static void main (String [] args)
 	{
-		int n = 7, k = 3, j = 2, l = 2;
+		int n = 5, k = 3, j = 1, l = 1;
 		
 		// Setup ticket range
 		int[] elements = new int[n];
@@ -102,12 +99,8 @@ public class TRIAL
 		
 		
 		// DFS Search all combinations for possible smallest values
-		Ticket nullTicket = new Ticket(); 
-		nullTicket.setNull();
-		
-		
 		// THIS IS IT, TAKES ALL THE TIME. 
-		runningSumBruteForce(nullTicket, null, elements, l);
+		runningSumBruteForce(new Ticket(-1), null, elements, l);
 		
 		System.out.println("RESULTS-----------------------");
 		System.out.println("Smallest = " + smallest);
@@ -179,10 +172,6 @@ public class TRIAL
 		}
 	}
 	
-	
-	
-	
-	
 	static void generateRecursive(int arr[], int data[], int start, int end, int index, int r, boolean ticket)
 	{
 		if (index == r)
@@ -213,6 +202,5 @@ public class TRIAL
 			data[index] = arr[i];
 			generateRecursive(arr, data, i+1, end, index+1, r, ticket);
 		}
-		// Comment
 	}
 }
