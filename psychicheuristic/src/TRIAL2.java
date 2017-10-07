@@ -1,6 +1,5 @@
-import java.util.ArrayList;
-import java.util.TreeSet;
-import java.util.LinkedList;
+import java.io.*;
+import java.util.*;
 
 class Combination 
 { 
@@ -49,8 +48,35 @@ public class TRIAL2
 	static ArrayList<Combination> possibilities = new ArrayList<Combination>(); 
 	public static void main (String [] args)
 	{
-		int n = 5, k = 4, j = 2, l = 2;
+		int n = 21, k = 10, j = 5, l = 2; 
+		
+		String inputName = args[0], outputName = args[1];
+		/*
+		try 
+		{
+			File inFile = new File(inputName);
+			Scanner in = new Scanner(inFile);
+			n = in.nextInt(); 
+			j = in.nextInt();
+			k = in.nextInt(); 
+			l = in.nextInt();
+			in.close();
+		}
+		catch (FileNotFoundException d)
+		{
+			System.out.println("File not found!");
+		}
+		
 		// n >= k >= j >= l
+		
+		if (n < k || k < j || j < l || n == 0 || k == 0 || j == 0 || l == 0) 
+		{
+			// BAD ARGUMENTS
+			System.out.println("Bad values for n, j, k, l!");
+			System.exit(1); 
+		}
+		*/
+				
 		
 		// Setup ticket range
 		int[] elements = new int[n];
@@ -63,25 +89,35 @@ public class TRIAL2
 		// Generate combinations of promised numbers j
 		generateRecursive(elements, givenData, 0, n-1, 0, j);
 	
-			
-		// Check off possibilities with tickets 
-		for (Combination s: possibilities)
-		{
-			System.out.println(s.getNumbers());
-		}
-		System.out.println(possibilities.size());
-		
-		
+
 		// DO THE ENTIRE THING
 		LinkedList<TreeSet<Integer>> results = generateTickets(l, k, n);
-		
-		// PRINT RESULTS
-		System.out.println("RESULTS------------------");
-		System.out.println("Number of Tickets == " + results.size());
-		for(TreeSet<Integer> d :results)
+		ArrayList<String> resultStrings = new ArrayList<String>(); 
+		for (TreeSet<Integer> d: results)
 		{
-			System.out.println(d.toString());
+			resultStrings.add(d.toString());
 		}
+		//Collections.sort(resultStrings);	
+		
+		// SEND RESULTS TO OUTFILE
+		try
+		{
+			File out = new File (outputName);
+			PrintWriter print = new PrintWriter (out);
+			print.println(results.size());
+			for (String a: resultStrings)
+			{
+				a.replace(",", "");
+				a.replace("[", "");
+				a.replace("]", "");
+				//a.replace
+				System.out.println(a);
+				print.println(a);
+			}
+			print.close();
+		}
+		catch (Exception exception) {}
+		
 
 	}
 	
@@ -92,16 +128,12 @@ public class TRIAL2
 		while (cont)
 		{
 			TreeSet<Integer> ticket = new TreeSet<Integer>();
-			System.out.println("New Ticket");
 			boolean denyEntry = false;
 			for (int index = 0; index < possibilities.size(); index++)
 			{
 				Combination toCheck = possibilities.get(index);
 				if (!toCheck.isChecked()) // We are only operating on unchecked combinations
 				{
-					System.out.println("The match needs " + 
-										(requiredToContain - (ticketSize - ticket.size()))
-										+ " and toCheck has " + toCheck.contains(ticket));
 					if (ticket.isEmpty()) 
 					{
 						// If the ticket is empty, get numbers of the first unchecked ticket
@@ -109,19 +141,16 @@ public class TRIAL2
 						toCheck.setChecked();
 						if (ticket.size() == ticketSize)
 							denyEntry = true;
-						System.out.println("Ticket now contains " + ticket.toString() + " and size = " + ticket.size());
 					}
 					else if (requiredToContain - (ticketSize - ticket.size()) <= toCheck.contains(ticket))//((ticket.size() - requiredToContain) == toCheck.contains(ticket)) 
 					{
 						if (!denyEntry) 
 						{
 							ticket.addAll(toCheck.getNumbers());
-							System.out.println("Ticket now contains " + ticket.toString() + " and size = " + ticket.size());
 							if (ticket.size() == ticketSize)
 								denyEntry = true;
 						}
 						toCheck.setChecked();
-						System.out.println("checked off " + toCheck.getID());
 					}
 					
 				}
@@ -129,18 +158,19 @@ public class TRIAL2
 			}
 			if (!ticket.isEmpty())
 			{
-				if (ticket.size() < ticketSize)
+				/*if (ticket.size() < ticketSize)
 				{
 					/* 	Runs only for the final ticket. If it works but is not
 					 * 	full, fill with random values. 
-					 */
+					 
 					for (int addExtra = 1; addExtra <= n && ticket.size() < ticketSize; addExtra++)
 					{
 						if (!ticket.contains(addExtra)) ticket.add(addExtra);
 					}
 				}
+				*/
+				
 				toReturn.add(ticket);
-				System.out.println("Adding a ticket\t\t " + ticket.toString());
 			}
 			else cont = false;
 		}
@@ -154,11 +184,10 @@ public class TRIAL2
 			Combination toAdd = new Combination();
 			for (int j=0; j<r; j++)
 			{
-				//System.out.print(data[j]+" ");
 				toAdd.addNumber(data[j]);
 			}
-				possibilities.add(toAdd);
-		
+			possibilities.add(toAdd);
+	
 		}
 		for (int i=start; i<=end && end-i+1 >= r-index; i++)
 		{

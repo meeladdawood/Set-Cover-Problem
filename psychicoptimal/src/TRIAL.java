@@ -1,3 +1,6 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.*;
 
 class Ticket
@@ -65,7 +68,31 @@ public class TRIAL
 	static ArrayList<Combination> possibilities = new ArrayList<Combination>(); 
 	public static void main (String [] args)
 	{
-		int n = 5, k = 4, j = 2, l = 2;
+		int n = 0, k = 0, j = 0, l = 0; 
+		String inputName = args[0], outputName = args[1];
+		try 
+		{
+			File inFile = new File(inputName);
+			Scanner in = new Scanner(inFile);
+			n = in.nextInt(); 
+			j = in.nextInt();
+			k = in.nextInt(); 
+			l = in.nextInt();
+			in.close();
+		}
+		catch (FileNotFoundException d)
+		{
+			System.out.println("File not found!");
+		}
+		
+		// n >= k >= j >= l
+		
+		if (n < k || k < j || j < l || n == 0 || k == 0 || j == 0 || l == 0) 
+		{
+			// BAD ARGUMENTS
+			System.out.println("Bad values for n, j, k, l!");
+			System.exit(1); 
+		}
 		
 		// Setup ticket range
 		int[] elements = new int[n];
@@ -109,6 +136,31 @@ public class TRIAL
 			for (Ticket winner:bestPath) 
 				System.out.println(winner.getNumbers());
 		}
+		
+		try
+		{
+			File out = new File (outputName);
+			if (out.exists())
+			{
+				out.delete();
+			}
+			out.createNewFile();
+			PrintWriter print = new PrintWriter (out);
+			print.println(results.size());
+			for (TreeSet<Integer> ticket: results)
+			{
+				for (Integer i:ticket)
+				{
+					print.print(i + " ");
+				}
+				print.println();
+			}
+			print.close();
+		}
+		catch (Exception exception) {}
+		
+		
+		
 	}
 	
 	static LinkedList<Ticket> runningSumBruteForce (Ticket root, LinkedList<Ticket> decisions, int[] data, int requiredToContain)
