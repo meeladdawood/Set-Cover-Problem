@@ -146,7 +146,7 @@ public class TRIAL
 			resultStrings.add(dd);
 		}
 		resultStrings.sort(new TicketComparator<String>());
-		
+		// YO DOG
 		try
 		{
 			File out = new File (outputName);
