@@ -1,5 +1,7 @@
 import java.io.*;
 import java.util.*;
+import java.util.regex.Pattern;
+import java.util.Comparator;
 
 class Combination 
 { 
@@ -97,7 +99,8 @@ public class TRIAL2
 		{
 			resultStrings.add(d.toString());
 		}
-		Collections.sort(resultStrings);	
+		Comparator<String> c = Comparator.comparing(String::toString);
+		resultStrings.sort(c);
 		
 		// SEND RESULTS TO OUTFILE
 		try
@@ -107,10 +110,14 @@ public class TRIAL2
 			print.println(results.size());
 			for (String a: resultStrings)
 			{
-				a.replace(",", "");
-				a.replace("[", "");
-				a.replace("]", "");
-				//a.replace
+				a = a.replaceAll("([\\[,\\]])", "");
+				//a.replace("[", "");
+				//a.replace("]", "");
+				//String pat = Pattern.quote("[,]");
+				//Pattern.compile(pat).matcher(a).replaceAll("");
+				
+				//a.replaceAll(pat, "");
+		
 				System.out.println(a);
 				print.println(a);
 			}
@@ -206,3 +213,18 @@ public class TRIAL2
 		}
 	}
 }
+
+class StringComp  implements Comparator<String> {
+	  public int compare(String obj1, String obj2) {
+	    if (obj1 == null) {
+	        return -1;
+	    }
+	    if (obj2 == null) {
+	        return 1;
+	    }
+	    if (obj1.equals( obj2 )) {
+	        return 0;
+	    }
+	    return obj1.compareTo(obj2);
+	  }
+	}
