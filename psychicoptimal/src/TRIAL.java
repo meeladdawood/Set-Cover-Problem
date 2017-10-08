@@ -3,6 +3,29 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.*;
 
+
+class TicketComparator<E> implements Comparator<E>
+{
+	public int compare(Object a, Object b)
+	{
+		String aa = (String)a;
+		String bb = (String)b;
+		String[] aarr = aa.split(" ");
+		String[] barr = bb.split(" ");
+		for (int i = 0; i < aarr.length; i++)
+		{
+			int check1 = Integer.parseInt(aarr[i]);
+			int check2 = Integer.parseInt(barr[i]);
+			//System.out.println("");
+			int toReturn = check1 - check2;
+			if (toReturn < 0)
+				return -1; 
+			else if (toReturn > 0)
+				return 1;
+		}
+		return 0;
+	}
+}
 class Ticket
 {
 	private static int IDCounter = 0;
@@ -102,55 +125,39 @@ public class TRIAL
 		
 		// Generate Possible Tickets of size k
 		generateRecursive(elements, data, 0, n-1, 0, k, true);
-		for (Ticket e:everything)
-		{
-			System.out.println(e.getID() + ":  " + e.getNumbers());
-		}
-		for (int checker:elements)
-			System.out.print(checker + " ");
-		System.out.println();
 		
 		// Setup promised number range
 		int[] givenData = new int[n];
 
 		// Generate combinations of promised numbers j
 		generateRecursive(elements, givenData, 0, n-1, 0, j, false);
-	
-			
-		// Check off possibilities with tickets 
-		for (Combination s: possibilities)
-		{
-			System.out.println(s.getNumbers());
-		}
-		System.out.println(possibilities.size());
 		
 		
 		// DFS Search all combinations for possible smallest values
 		// THIS IS IT, TAKES ALL THE TIME. 
 		runningSumBruteForce(new Ticket(-1), null, elements, l);
 		
-		System.out.println("RESULTS-----------------------");
-		System.out.println("Smallest = " + smallest);
-		if (bestPath != null)
+		ArrayList<String> resultStrings = new ArrayList<String>(); 
+		Collections.sort(resultStrings);
+		for (Ticket d: bestPath)
 		{
-			for (Ticket winner:bestPath) 
-				System.out.println(winner.getNumbers());
+			String dd = d.getNumbers().toString();
+			dd = dd.replaceAll("([\\[,\\]])", "");
+			resultStrings.add(dd);
 		}
+		resultStrings.sort(new TicketComparator<String>());
 		
 		try
 		{
 			File out = new File (outputName);
-			if (out.exists())
-			{
-				out.delete();
-			}
 			out.createNewFile();
 			PrintWriter print = new PrintWriter (out);
 			print.println(smallest);
-			for (Ticket tick: bestPath)
+			//System.out.println(smallest);
+			for (String str : resultStrings)
 			{
-
-				print.println(tick.getNumbers() + " ");
+				//System.out.println(str);
+				print.println(str);
 			}
 			print.close();
 		}
@@ -203,8 +210,7 @@ public class TRIAL
 					{
 						bestPath = new LinkedList<Ticket>(found);
 						smallest = found.size();
-						System.out.println("FOUND NEW SMALLEST: " + smallest);
-
+						//System.out.println("FOUND NEW SMALLEST: " + smallest);
 					}
 				}
 			}

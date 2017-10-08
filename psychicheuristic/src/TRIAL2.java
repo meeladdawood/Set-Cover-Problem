@@ -1,4 +1,3 @@
-import java.awt.datatransfer.StringSelection;
 import java.io.*;
 import java.util.*;
 
@@ -12,13 +11,14 @@ class TicketComparator<E> implements Comparator<E>
 		String[] barr = bb.split(" ");
 		for (int i = 0; i < aarr.length; i++)
 		{
-			System.out.println("");
-			int toReturn = aarr[i].compareTo(barr[i]);
-			if (toReturn != 0) 
-			{
-				
-				return toReturn;
-			}
+			int check1 = Integer.parseInt(aarr[i]);
+			int check2 = Integer.parseInt(barr[i]);
+			//System.out.println("");
+			int toReturn = check1 - check2;
+			if (toReturn < 0)
+				return -1; 
+			else if (toReturn > 0)
+				return 1;
 		}
 		return 0;
 	}
@@ -52,15 +52,6 @@ class Combination
 		int startSize = temporary.size();
 		temporary.removeAll(b);
 		return (startSize - temporary.size());
-	}
-	// REDUNDANT XD
-	public int notContains (TreeSet<Integer> c)
-	{
-		// How many numbers of this instance is c missing?
-		if (c.isEmpty()) return numbers.size();
-		TreeSet<Integer> temporary = new TreeSet<Integer>(numbers);
-		temporary.removeAll(c);
-		return temporary.size();
 	}
 }
 
@@ -115,7 +106,7 @@ public class TRIAL2
 		// DO THE ENTIRE THING
 		LinkedList<TreeSet<Integer>> results = generateTickets(l, k, n);
 		ArrayList<String> resultStrings = new ArrayList<String>(); 
-		Collections.sort(resultStrings);
+	//	Collections.sort(resultStrings);
 		for (TreeSet<Integer> d: results)
 		{
 			LinkedList<Integer> dd = new LinkedList<Integer>(); 
@@ -125,8 +116,9 @@ public class TRIAL2
 			String entry = dd.toString();
 			entry = entry.replaceAll("([\\[,\\]])", "");
 			resultStrings.add(entry);
-		}
-
+		}	
+		
+		resultStrings.sort(new TicketComparator<String>());
 		// SEND RESULTS TO OUTFILE
 		try
 		{
@@ -135,8 +127,7 @@ public class TRIAL2
 			print.println(results.size());
 			for (String a: resultStrings)
 			{
-				//a.replace
-				System.out.println(a);
+				//System.out.println(a);
 				print.println(a);
 			}
 			print.close();
