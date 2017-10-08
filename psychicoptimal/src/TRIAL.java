@@ -146,14 +146,11 @@ public class TRIAL
 			}
 			out.createNewFile();
 			PrintWriter print = new PrintWriter (out);
-			print.println(results.size());
-			for (TreeSet<Integer> ticket: results)
+			print.println(smallest);
+			for (Ticket tick: bestPath)
 			{
-				for (Integer i:ticket)
-				{
-					print.print(i + " ");
-				}
-				print.println();
+
+				print.println(tick.getNumbers() + " ");
 			}
 			print.close();
 		}

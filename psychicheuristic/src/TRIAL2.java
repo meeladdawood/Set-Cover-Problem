@@ -48,10 +48,10 @@ public class TRIAL2
 	static ArrayList<Combination> possibilities = new ArrayList<Combination>(); 
 	public static void main (String [] args)
 	{
-		int n = 21, k = 10, j = 5, l = 2; 
+		int n = 0, k = 0, j = 0, l = 0;
 		
 		String inputName = args[0], outputName = args[1];
-		/*
+		
 		try 
 		{
 			File inFile = new File(inputName);
@@ -75,7 +75,7 @@ public class TRIAL2
 			System.out.println("Bad values for n, j, k, l!");
 			System.exit(1); 
 		}
-		*/
+		
 				
 		
 		// Setup ticket range
@@ -97,7 +97,7 @@ public class TRIAL2
 		{
 			resultStrings.add(d.toString());
 		}
-		//Collections.sort(resultStrings);	
+		Collections.sort(resultStrings);	
 		
 		// SEND RESULTS TO OUTFILE
 		try
@@ -137,7 +137,12 @@ public class TRIAL2
 					if (ticket.isEmpty()) 
 					{
 						// If the ticket is empty, get numbers of the first unchecked ticket
-						ticket.addAll(toCheck.getNumbers());
+						TreeSet<Integer> numb = toCheck.getNumbers();
+						Iterator<Integer> it = numb.iterator();
+						while (ticket.size() < ticketSize && it.hasNext())
+						{
+							ticket.add(it.next());
+						}
 						toCheck.setChecked();
 						if (ticket.size() == ticketSize)
 							denyEntry = true;
@@ -146,7 +151,12 @@ public class TRIAL2
 					{
 						if (!denyEntry) 
 						{
-							ticket.addAll(toCheck.getNumbers());
+							TreeSet<Integer> numb = toCheck.getNumbers();
+							Iterator<Integer> it = numb.iterator();
+							while (ticket.size() < ticketSize && it.hasNext())
+							{
+								ticket.add(it.next());
+							}
 							if (ticket.size() == ticketSize)
 								denyEntry = true;
 						}
@@ -158,17 +168,17 @@ public class TRIAL2
 			}
 			if (!ticket.isEmpty())
 			{
-				/*if (ticket.size() < ticketSize)
+				if (ticket.size() < ticketSize)
 				{
 					/* 	Runs only for the final ticket. If it works but is not
 					 * 	full, fill with random values. 
-					 
+					 */
 					for (int addExtra = 1; addExtra <= n && ticket.size() < ticketSize; addExtra++)
 					{
 						if (!ticket.contains(addExtra)) ticket.add(addExtra);
 					}
 				}
-				*/
+				
 				
 				toReturn.add(ticket);
 			}
