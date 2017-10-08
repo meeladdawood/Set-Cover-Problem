@@ -1,6 +1,28 @@
+import java.awt.datatransfer.StringSelection;
 import java.io.*;
 import java.util.*;
 
+class TicketComparator<E> implements Comparator<E>
+{
+	public int compare(Object a, Object b)
+	{
+		String aa = (String)a;
+		String bb = (String)b;
+		String[] aarr = aa.split(" ");
+		String[] barr = bb.split(" ");
+		for (int i = 0; i < aarr.length; i++)
+		{
+			System.out.println("");
+			int toReturn = aarr[i].compareTo(barr[i]);
+			if (toReturn != 0) 
+			{
+				
+				return toReturn;
+			}
+		}
+		return 0;
+	}
+}
 class Combination 
 { 
 	private static int IDCounter = 0; 
@@ -93,12 +115,18 @@ public class TRIAL2
 		// DO THE ENTIRE THING
 		LinkedList<TreeSet<Integer>> results = generateTickets(l, k, n);
 		ArrayList<String> resultStrings = new ArrayList<String>(); 
+		Collections.sort(resultStrings);
 		for (TreeSet<Integer> d: results)
 		{
-			resultStrings.add(d.toString());
+			LinkedList<Integer> dd = new LinkedList<Integer>(); 
+			for (Integer ddd: d)
+				dd.add(ddd);
+			Collections.sort(dd);
+			String entry = dd.toString();
+			entry = entry.replaceAll("([\\[,\\]])", "");
+			resultStrings.add(entry);
 		}
-		Collections.sort(resultStrings);	
-		
+
 		// SEND RESULTS TO OUTFILE
 		try
 		{
@@ -107,9 +135,6 @@ public class TRIAL2
 			print.println(results.size());
 			for (String a: resultStrings)
 			{
-				a.replace(",", "");
-				a.replace("[", "");
-				a.replace("]", "");
 				//a.replace
 				System.out.println(a);
 				print.println(a);
