@@ -161,7 +161,10 @@ public class TRIAL
 			}
 			print.close();
 		}
-		catch (Exception exception) {}
+		catch (Exception exception) 
+		{
+			System.out.println("Unable to print to file");
+		}
 		
 		
 		
