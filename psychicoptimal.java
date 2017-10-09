@@ -100,7 +100,7 @@ class TicketComparator<E> implements Comparator<E>
 	}
 }
 
-public class TRIAL 
+public class psychicoptimal 
 {
 	static int smallest = Integer.MAX_VALUE;
 	static LinkedList<Ticket> bestPath = null;

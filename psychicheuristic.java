@@ -10,6 +10,7 @@ import java.util.*;
 /**	Class "TicketComparator"
  * 	Compares the Integer values of Strings, returns the comparison result.
  * 	For use when sorting the final results in lex order.
+ * 
  */
 class TicketComparator<E> implements Comparator<E>
 {
@@ -74,7 +75,7 @@ class Combination
 	}
 }
 
-public class TRIAL2
+public class psychicheuristic
 {
 	static int smallest = Integer.MAX_VALUE;
 	static ArrayList<Combination> possibilities = new ArrayList<Combination>(); 
